@@ -10,6 +10,20 @@ Deux références de conception s'appliquent à ce projet et priment sur toute r
 
 Ce document décrit **quoi construire et pourquoi**, ainsi que les limites non négociables. Il ne prescrit **pas** l'architecture de fichiers ni les détails d'implémentation interne — ces décisions relèvent du jugement de l'agent qui implémente, tant qu'il respecte les contraintes ci-dessous (y compris la stack et le design, qui eux sont fixés).
 
+> **Note sur ce dépôt.** Planning a d'abord été développé comme module du monorepo
+> Jarvis, qui réunit plusieurs applications sous un même toit. Ce dépôt-ci en est
+> une **extraction autonome** : les quatre paquets internes dont Planning dépend
+> sont embarqués dans `packages/`, et l'application se construit et tourne seule.
+>
+> Deux conséquences pour qui reprend le code ici :
+> - Les deux documents cités juste au-dessus (le `CLAUDE.md` et le `DESIGN.md` de
+>   "Patrimoine Manager") vivent dans le monorepo et ne sont pas dans ce dépôt.
+>   Les tokens de design qu'ils fixent sont, eux, bien présents, appliqués dans
+>   `packages/design-system/src/styles/tokens.css`.
+> - `packages/data-layer` se replie sur `localStorage` hors du monorepo. Dans le
+>   shell Jarvis, le même code écrit dans une base SQLite partagée via IPC — d'où
+>   l'indirection de `moduleKV()`, qui n'est pas inutile ici mais porte ce choix.
+
 ---
 
 ## 1. Contraintes non négociables

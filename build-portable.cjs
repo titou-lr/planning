@@ -65,7 +65,8 @@ function runNoPipe(command, args, cwd) {
     if (r.status !== 0) {
       throw new Error(`${command} a quitté avec le code ${r.status}\n${stdout}\n${stderr}`)
     }
-    return stdout
+    // electron-builder attend { stdout, stderr } pour valider la sortie de makensis.
+    return { stdout, stderr }
   } finally {
     try { fs.unlinkSync(outPath) } catch {}
     try { fs.unlinkSync(errPath) } catch {}
