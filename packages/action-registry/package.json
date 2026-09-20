@@ -1,0 +1,12 @@
+{
+  "name": "@jarvis/action-registry",
+  "private": true,
+  "version": "0.0.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@jarvis/shared-types": "workspace:*",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.5"
+  }
+}

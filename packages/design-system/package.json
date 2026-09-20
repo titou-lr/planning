@@ -1,0 +1,11 @@
+{
+  "name": "@jarvis/design-system",
+  "private": true,
+  "version": "0.0.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@fontsource/geist-mono": "^5.2.5",
+    "@fontsource/geist-sans": "^5.2.5"
+  }
+}
