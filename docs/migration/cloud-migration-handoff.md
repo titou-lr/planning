@@ -14,7 +14,7 @@ Date : 21 septembre 2026.
 
 ## Base distante
 
-Les 19 tables Planning sont dans `public`, avec RLS et grants minimaux. Les sept tables de l'ancien projet Prisma et leurs deux enums sont conservés, avec 45 lignes au total, dans le schéma non exposé `legacy_backup_20260921`. Voir `legacy-prisma-archive.md` pour la restauration.
+Les 19 tables Planning sont dans `public`, avec RLS et grants minimaux. La structure des sept tables de l'ancien projet Prisma et de leurs deux enums est sauvegardée dans `legacy-prisma-schema.sql`; leur schéma distant, qui contenait 45 lignes abandonnées, a été supprimé. Voir `legacy-prisma-archive.md`.
 
 Le client utilise uniquement la clé publiable Supabase. Aucun secret privilégié n'est présent dans le bundle.
 
@@ -31,7 +31,7 @@ Le client utilise uniquement la clé publiable Supabase. Aucun secret privilégi
 
 - Les données locales restent exportables/importables en JSON et IndexedDB demeure la source immédiate.
 - Une déconnexion Supabase laisse l'application exploitable localement.
-- L'ancien schéma Prisma est restaurable avec la transaction documentée dans `legacy-prisma-archive.md`.
+- La structure vide de l'ancien schéma Prisma est recréable avec `legacy-prisma-schema.sql`; les anciennes données abandonnées ont été supprimées avec l'autorisation du propriétaire.
 - Les migrations SQL sont versionnées et ne doivent pas être réécrites.
 
 ## Hors périmètre de cette livraison

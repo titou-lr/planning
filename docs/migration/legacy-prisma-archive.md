@@ -1,8 +1,8 @@
-# Archive Prisma historique
+# Suppression du schéma Prisma historique
 
 Date d'archivage : 21 septembre 2026.
 
-Le schéma abandonné a été retiré de `public` sans perte en déplaçant ses objets vers le schéma privé `legacy_backup_20260921`. Ce schéma n'est pas exposé par la Data API et les rôles `public`, `anon` et `authenticated` n'y ont aucun droit.
+Le schéma abandonné a d'abord été retiré de `public` et isolé dans `legacy_backup_20260921`. Sa structure complète a ensuite été exportée dans `legacy-prisma-schema.sql`, testée dans une transaction, puis le schéma distant et ses données ont été supprimés conformément à l'autorisation du propriétaire.
 
 ## Inventaire vérifié avant archivage
 
@@ -16,24 +16,10 @@ Le schéma abandonné a été retiré de `public` sans perte en déplaçant ses 
 | `Reminder` | 3 |
 | `Event` | 2 |
 
-Les types `BlockType` et `Priority`, les clés primaires, la contrainte unique sur `User.email`, les clés étrangères, les index et toutes les lignes ont été conservés par `ALTER ... SET SCHEMA`.
+La sauvegarde de structure conserve les types `BlockType` et `Priority`, toutes les colonnes et valeurs par défaut, les clés primaires, la contrainte unique sur `User.email` et les clés étrangères. Les données abandonnées ne sont pas incluses dans cette sauvegarde.
 
-## Restauration d'urgence
+## Restauration de la structure
 
-La restauration doit être effectuée dans une transaction et seulement si aucun objet du même nom n'existe dans `public` :
+Exécuter `legacy-prisma-schema.sql`. Le script recrée un schéma privé `legacy_prisma_restore` vide, sans l'exposer à la Data API et sans accorder de droits à `anon` ou `authenticated`.
 
-```sql
-begin;
-alter type legacy_backup_20260921."BlockType" set schema public;
-alter type legacy_backup_20260921."Priority" set schema public;
-alter table legacy_backup_20260921."User" set schema public;
-alter table legacy_backup_20260921."Page" set schema public;
-alter table legacy_backup_20260921."Block" set schema public;
-alter table legacy_backup_20260921."ReminderList" set schema public;
-alter table legacy_backup_20260921."Reminder" set schema public;
-alter table legacy_backup_20260921."Event" set schema public;
-alter table legacy_backup_20260921._prisma_migrations set schema public;
-commit;
-```
-
-Ne pas restaurer ces tables dans un schéma exposé sans activer RLS et définir des politiques adaptées à l'ancien modèle.
+Ne pas déplacer ces tables vers un schéma exposé sans activer RLS et définir des politiques adaptées à l'ancien modèle.
