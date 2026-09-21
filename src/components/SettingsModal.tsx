@@ -16,6 +16,7 @@ import {
   clearSessionKey, decryptStoredValue, encryptStoredValue, hasSessionKey, provideSessionKey,
 } from '../store/secureStorage'
 import PrintSpace from './PrintSpace'
+import CloudSyncSettings from './CloudSyncSettings'
 import { useToast } from './Toast'
 import { IconDownload, IconUpload, IconBell, IconX, IconUser, IconPlus, IconTrash, IconWand, IconAlert } from './icons'
 
@@ -73,6 +74,8 @@ export default function SettingsModal({ profile, onClose }: { profile: Profile; 
               <span className="caption mono">{data.pages.length} pages</span>
             </div>
           </div>
+
+          <CloudSyncSettings />
 
           <div className="col gap8">
             <span className="eyebrow" style={{ color: 'var(--ink-tertiary)' }}>Sauvegarde &amp; restauration</span>

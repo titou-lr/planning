@@ -4,6 +4,7 @@ import { requestProfileSwitch } from '../store/profileService'
 import { useStore, type AppSection } from '../store/useStore'
 import { useReminders } from '../store/useReminders'
 import { useAiSettings } from '../store/aiSettings'
+import { useCloudSync } from '../cloud/cloudState'
 import { findPage, ancestorsOf } from '../core/tree'
 import SidebarTree from './SidebarTree'
 import CommandPalette from './CommandPalette'
@@ -39,6 +40,7 @@ export default function Shell({ profile }: { profile: Profile }) {
   const currentPageId = useStore((s) => s.currentPageId)
   const section = useStore((s) => s.section)
   const pages = useStore((s) => s.data.pages)
+  const cloudStatus = useCloudSync((state) => state.status)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [assistantOpen, setAssistantOpen] = useState(false)
@@ -120,7 +122,9 @@ export default function Shell({ profile }: { profile: Profile }) {
           <span style={{ fontSize: 18 }}>{profile.avatar}</span>
           <div className="col ws-label" style={{ minWidth: 0 }}>
             <span className="subhead" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{profile.name}</span>
-            <span className="caption" style={{ fontSize: 11 }}>Espace local</span>
+            <span className="caption" style={{ fontSize: 11 }}>
+              {cloudStatus === 'synced' ? 'Synchronisé' : cloudStatus === 'syncing' ? 'Synchronisation…' : cloudStatus === 'offline' ? 'Hors ligne' : 'Espace local'}
+            </span>
           </div>
         </div>
 

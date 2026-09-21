@@ -10,6 +10,7 @@ import { PriorityIcon, catVar, formatMin } from './shared'
 import { toast } from '../Toast'
 import { IconPlay, IconStop, IconPlus, IconTrash, IconX, IconLink } from '../icons'
 import { uid } from '../../core/id'
+import { CloudDownload } from '../CloudFile'
 
 /** Panneau de détail d'une tâche (§6.1, §6.3) — DESIGN.md §6.10. */
 export default function TaskDetail({ task }: { task: Task }) {
@@ -45,7 +46,7 @@ export default function TaskDetail({ task }: { task: Task }) {
       const file = input.files?.[0]
       if (!file) return
       if (file.size > 2 * 1024 * 1024) {
-        toast('Pièce jointe limitée à 2 Mo (stockage local)')
+        toast('Pièce jointe limitée à 2 Mo')
         return
       }
       const reader = new FileReader()
@@ -320,7 +321,7 @@ export default function TaskDetail({ task }: { task: Task }) {
           </div>
           {task.attachments.map((a) => (
             <div key={a.id} className="row gap6" style={{ minHeight: 26 }}>
-              <a href={a.src} download={a.name} className="small" style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.name}</a>
+              <CloudDownload src={a.src} name={a.name} className="small" style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.name}</CloudDownload>
               <button className="btn btn-icon btn-sm btn-ghost" onClick={() => up({ attachments: task.attachments.filter((x) => x.id !== a.id) })}>
                 <IconX width={11} height={11} />
               </button>

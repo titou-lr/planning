@@ -71,4 +71,20 @@ describe('WorkspaceRepository IndexedDB', () => {
       'outbox', 'syncState', 'blobs',
     ]))
   })
+
+  it('enregistre les mutations cloud dans la même persistance locale', async () => {
+    const repository = createRepository()
+    await repository.replaceAll(representativeWorkspace)
+    const next = {
+      ...representativeWorkspace,
+      pages: representativeWorkspace.pages.map((page, index) => index === 0 ? { ...page, title: 'Cloud' } : page),
+    }
+
+    await repository.persistDiff(representativeWorkspace, next, { workspaceId: 'workspace', deviceId: 'device' })
+
+    expect(await repository.load()).toEqual(next)
+    expect(await repository.listOutbox('workspace')).toEqual([
+      expect.objectContaining({ entityType: 'page', operation: 'upsert', payload: next.pages[0] }),
+    ])
+  })
 })

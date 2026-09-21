@@ -9,6 +9,7 @@ import { useStore } from '../../store/useStore'
 import { searchPages } from '../../core/search'
 import RenderInline from './RenderInline'
 import { IconGrip, IconPlus, IconTrash } from '../icons'
+import { CloudImage } from '../CloudFile'
 
 /**
  * Éditeur de texte riche par blocs :
@@ -19,7 +20,7 @@ import { IconGrip, IconPlus, IconTrash } from '../icons'
  * - blocs non focalisés rendus avec mise en forme + liens [[Page]]
  *   cliquables ; le bloc en cours d'édition montre le texte brut
  * - autocomplétion [[ pour lier une page
- * - collage d'image → bloc image (data URL, 100% local)
+ * - collage d'image → bloc image (local, puis bucket privé si le cloud est connecté)
  */
 
 interface Props {
@@ -296,7 +297,7 @@ export default function BlockEditor({ page, onChangeBlocks }: Props) {
     if (b.type === 'image')
       return (
         <div className="col gap4" style={{ padding: '4px 0' }}>
-          <img src={b.src} alt={b.text} style={{ maxWidth: '100%', borderRadius: 'var(--r-md)', border: '1px solid var(--hairline)' }} />
+          <CloudImage src={b.src} alt={b.text} style={{ maxWidth: '100%', borderRadius: 'var(--r-md)', border: '1px solid var(--hairline)' }} />
           {b.text && <span className="caption">{b.text}</span>}
         </div>
       )

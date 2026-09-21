@@ -5,6 +5,7 @@ import type {
   WorkspaceData,
 } from '../core/types'
 import { normalizeWorkspace } from '../core/workspace'
+import { buildOutbox, snapshotOutbox } from '../cloud/syncProtocol'
 
 interface VersionRecord extends PageVersion {
   key: string
@@ -36,6 +37,11 @@ export interface SyncStateRecord {
   workspaceId: string
   cursor: string | null
   lastPulledAt: string | null
+}
+
+export interface SyncContext {
+  workspaceId: string
+  deviceId: string
 }
 
 export interface LocalBlobRecord {
@@ -211,13 +217,13 @@ export class WorkspaceRepository {
     })
   }
 
-  async persistDiff(previous: WorkspaceData, next: WorkspaceData): Promise<void> {
+  async persistDiff(previous: WorkspaceData, next: WorkspaceData, sync: SyncContext | null = null): Promise<void> {
     if (previous === next) return
     await this.db.transaction('rw', [
       this.db.pages, this.db.versions, this.db.tasks, this.db.statuses, this.db.labels,
       this.db.projects, this.db.cycles, this.db.goals, this.db.savedTaskViews,
       this.db.automations, this.db.projectTemplates, this.db.taskFields, this.db.events,
-      this.db.habits, this.db.sessions, this.db.meta,
+      this.db.habits, this.db.sessions, this.db.meta, this.db.outbox,
     ], async () => {
       await Promise.all([
         persistEntityDiff(this.db.pages, previous.pages, next.pages),
@@ -251,6 +257,41 @@ export class WorkspaceRepository {
         updatedAt: new Date().toISOString(),
         orders: workspaceOrders(next),
       })
+      if (sync) {
+        const records = buildOutbox(previous, next, sync.workspaceId, sync.deviceId)
+        if (records.length) await this.db.outbox.bulkPut(records)
+      }
     })
+  }
+
+  async enqueueSnapshot(data: WorkspaceData, sync: SyncContext): Promise<number> {
+    const records = snapshotOutbox(data, sync.workspaceId, sync.deviceId)
+    if (records.length) await this.db.outbox.bulkPut(records)
+    return records.length
+  }
+
+  async listOutbox(workspaceId: string, limit = 200): Promise<OutboxRecord[]> {
+    return this.db.outbox.where('workspaceId').equals(workspaceId).limit(limit).sortBy('createdAtLocal')
+  }
+
+  async removeOutbox(mutationIds: string[]): Promise<void> {
+    if (mutationIds.length) await this.db.outbox.bulkDelete(mutationIds)
+  }
+
+  async markOutboxAttempt(mutationIds: string[]): Promise<void> {
+    await this.db.transaction('rw', this.db.outbox, async () => {
+      for (const mutationId of mutationIds) {
+        const record = await this.db.outbox.get(mutationId)
+        if (record) await this.db.outbox.put({ ...record, attempts: record.attempts + 1 })
+      }
+    })
+  }
+
+  getSyncState(workspaceId: string): Promise<SyncStateRecord | undefined> {
+    return this.db.syncState.get(workspaceId)
+  }
+
+  putSyncState(state: SyncStateRecord): Promise<string> {
+    return this.db.syncState.put(state)
   }
 }

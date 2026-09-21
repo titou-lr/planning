@@ -18,5 +18,5 @@ export default function App() {
   if (active.enc && !hasSessionKey()) {
     return <><UnlockScreen profile={active} onUnlocked={() => forceRender((n) => n + 1)} />{pwaPrompt}</>
   }
-  return <><WorkspaceGate><Shell profile={active} /></WorkspaceGate>{pwaPrompt}</>
+  return <><WorkspaceGate profile={active}><Shell profile={active} /></WorkspaceGate>{pwaPrompt}</>
 }

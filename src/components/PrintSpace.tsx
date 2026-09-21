@@ -5,6 +5,7 @@ import { childrenOf } from '../core/tree'
 import { formatPropValue, propValue } from '../core/database'
 import RenderInline from './editor/RenderInline'
 import { IconX } from './icons'
+import { CloudImage } from './CloudFile'
 
 /**
  * Export PDF de l'espace complet (§5.9) : rendu lecture seule de toutes
@@ -36,7 +37,7 @@ function PrintBlock({ block }: { block: Block }) {
     case 'quote': return <blockquote style={{ borderLeft: '2px solid var(--hairline-strong)', margin: '4px 0', paddingLeft: 10, color: 'var(--ink-subtle)' }}><RenderInline text={block.text} /></blockquote>
     case 'code': return <pre className="mono" style={{ background: 'var(--surface-1)', padding: 8, borderRadius: 6, fontSize: 12, whiteSpace: 'pre-wrap' }}>{block.text}</pre>
     case 'divider': return <hr className="divider" style={{ margin: '10px 0' }} />
-    case 'image': return block.src ? <img src={block.src} alt={block.text} style={{ maxWidth: '100%' }} /> : null
+    case 'image': return block.src ? <CloudImage src={block.src} alt={block.text} style={{ maxWidth: '100%' }} /> : null
     case 'table': return (
       <table style={{ borderCollapse: 'collapse', margin: '6px 0' }}>
         <tbody>

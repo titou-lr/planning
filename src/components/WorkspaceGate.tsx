@@ -1,17 +1,22 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import type { Profile } from '../store/profileService'
 import { initializeWorkspacePersistence } from '../store/workspacePersistence'
 
-export default function WorkspaceGate({ children }: { children: ReactNode }) {
+export default function WorkspaceGate({ children, profile }: { children: ReactNode; profile: Profile }) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
 
   useEffect(() => {
     let active = true
     void initializeWorkspacePersistence().then(
-      () => { if (active) setStatus('ready') },
+      async () => {
+        if (active) setStatus('ready')
+        const { initializeCloudSync } = await import('../cloud/cloudSync')
+        await initializeCloudSync(profile).catch((error: unknown) => console.error('Cloud initialization failed', error))
+      },
       () => { if (active) setStatus('error') },
     )
     return () => { active = false }
-  }, [])
+  }, [profile])
 
   if (status === 'loading') {
     return <div className="caption" style={{ padding: 24 }}>Préparation des données locales…</div>

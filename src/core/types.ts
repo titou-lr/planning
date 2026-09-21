@@ -31,7 +31,7 @@ export interface Block {
   checked?: boolean
   /** Blocs code. */
   language?: string
-  /** Blocs image : data URL ou chemin. */
+  /** Blocs image : data URL locale, URL externe ou référence Storage privée. */
   src?: string
   /** Blocs table : lignes × colonnes de texte brut. */
   rows?: string[][]
@@ -174,7 +174,7 @@ export interface ChecklistItem {
 export interface Attachment {
   id: string
   name: string
-  /** data URL (stockage local uniquement). */
+  /** data URL locale ou référence Storage privée après synchronisation. */
   src: string
 }
 

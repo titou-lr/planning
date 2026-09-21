@@ -42,6 +42,6 @@ export default defineConfig({
   ],
   test: {
     environment: 'node',
-    include: ['src/core/**/*.test.ts', 'src/store/**/*.test.ts', 'src/data/**/*.test.ts', 'src/*.test.ts'],
+    include: ['src/core/**/*.test.ts', 'src/store/**/*.test.ts', 'src/data/**/*.test.ts', 'src/cloud/**/*.test.ts', 'src/*.test.ts'],
   },
 })
