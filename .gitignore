@@ -9,3 +9,5 @@ supabase/.temp/
 supabase/.branches/
 *.tsbuildinfo
 .DS_Store
+.vercel
+.env*

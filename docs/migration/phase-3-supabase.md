@@ -9,7 +9,7 @@ Date de préparation : 21 septembre 2026.
 - Région : `eu-west-3`.
 - État après reprise : `ACTIVE_HEALTHY`.
 
-Le projet a été réveillé sans suppression de données. La migration Planning complète a été exécutée dans une transaction distante immédiatement annulée. La syntaxe, les tables, contraintes, indexes, triggers, politiques RLS, bucket Storage et tests d'isolation passent sans laisser d'objet créé.
+Le projet a été réveillé sans suppression de données. Après une validation complète dans une transaction annulée, la migration Planning a été appliquée le 21 septembre 2026 sous le nom distant `initial_cloud_schema` (version `20260921121130`).
 
 ## Schéma préparé
 
@@ -37,12 +37,11 @@ La décision restante est soit de conserver ces tables et définir leurs politiq
 
 ## Validation et limites
 
-- Migration SQL : validée avec `BEGIN … ROLLBACK` sur Postgres 17 distant.
-- RLS : propriétaire autorisé, second utilisateur isolé dans les tests pgTAP.
-- Application persistante distante : non exécutée.
+- Migration SQL : appliquée sur Postgres 17 distant.
+- RLS : propriétaire autorisé, second utilisateur isolé dans les tests pgTAP rejoués après application ; les données de test et l'extension pgTAP temporaire ont été annulées par transaction.
 - Tests locaux Supabase : non exécutables sur ce poste faute de runtime Docker.
-- Génération des types : reportée après application effective de la migration.
+- Types TypeScript : générés depuis le schéma distant dans `src/data/supabase.types.ts`.
 
 ## Vercel
 
-Le plugin est activé, mais aucune équipe n'est visible et le CLI réclame une nouvelle authentification. Aucun projet Vercel n'a été créé ou lié. Une connexion `vercel login` ou un jeton `VERCEL_TOKEN` est nécessaire avant le bootstrap preview.
+La CLI est authentifiée sous `titou-lr`. Le projet `planning` a été créé dans l'équipe `titou-lrs-projects`, relié au dépôt GitHub et déployé sur `https://planning-bay-six.vercel.app`. Les scénarios Playwright distants valident desktop, mobile, manifeste, service worker, IndexedDB et mode hors ligne.
