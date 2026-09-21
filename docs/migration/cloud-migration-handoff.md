@@ -24,6 +24,7 @@ Le client utilise uniquement la clé publiable Supabase. Aucun secret privilégi
 - 8 assertions pgTAP réussies avec deux identités distinctes.
 - Build TypeScript/Vite/PWA réussi; bundle initial environ 408 kB brut (130 kB gzip).
 - 9 scénarios Playwright réussis sur Chromium desktop et mobile; 3 contrôles PWA sont volontairement limités au projet desktop.
+- Test cloud de production réussi avec deux contextes navigateur indépendants : une page créée sur le premier a convergé sur le second; le compte et toutes les données temporaires ont ensuite été supprimés.
 - Vérification des advisors Supabase : aucune table exposée sans RLS. L'option de protection contre les mots de passe compromis reste signalée, sans impact sur le flux passwordless retenu.
 
 ## Rollback

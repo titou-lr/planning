@@ -54,11 +54,11 @@ test('deux appareils convergent via le journal Supabase', async ({ browser }) =>
   await firstPage.getByPlaceholder('Sans titre').fill('Convergence Supabase validée')
   await firstPage.getByText('Réglages', { exact: true }).click()
   await firstPage.getByRole('button', { name: 'Synchroniser maintenant' }).click()
-  await expect(firstPage.getByText('Synchronisé', { exact: true })).toBeVisible({ timeout: 20_000 })
+  await expect(firstPage.getByText('Synchronisé', { exact: true }).first()).toBeVisible({ timeout: 20_000 })
 
   const secondPage = await second.newPage()
   await createProfile(secondPage, 'Cloud appareil 2')
-  await expect(secondPage.getByText('Convergence Supabase validée', { exact: true })).toBeVisible({ timeout: 20_000 })
+  await expect(secondPage.getByText('Convergence Supabase validée', { exact: true }).first()).toBeVisible({ timeout: 20_000 })
 
   await first.close()
   await second.close()
