@@ -19,6 +19,8 @@ let session: Session | null = null
 let channel: RealtimeChannel | null = null
 let initialized = false
 let syncPromise: Promise<void> | null = null
+let connectPromise: Promise<void> | null = null
+let connectedUserId: string | null = null
 
 function update(patch: Partial<CloudState>): void {
   useCloudSync.setState(patch)
@@ -37,6 +39,7 @@ async function disconnectRuntime(): Promise<void> {
   setWorkspaceSyncContext(null)
   if (channel && cloudConfigured) await getSupabase().removeChannel(channel)
   channel = null
+  connectedUserId = null
 }
 
 async function ensureWorkspace(userId: string): Promise<string> {
@@ -145,7 +148,7 @@ export function syncNow(): Promise<void> {
   return syncPromise
 }
 
-async function connect(currentSession: Session): Promise<void> {
+async function connectOnce(currentSession: Session): Promise<void> {
   session = currentSession
   update({ status: 'connecting', email: currentSession.user.email ?? null, error: null })
   const workspaceId = await ensureWorkspace(currentSession.user.id)
@@ -170,6 +173,15 @@ async function connect(currentSession: Session): Promise<void> {
     .subscribe()
 
   await syncNow()
+  connectedUserId = currentSession.user.id
+}
+
+function connect(currentSession: Session): Promise<void> {
+  session = currentSession
+  if (connectedUserId === currentSession.user.id && useCloudSync.getState().workspaceId) return syncNow()
+  if (connectPromise) return connectPromise
+  connectPromise = connectOnce(currentSession).finally(() => { connectPromise = null })
+  return connectPromise
 }
 
 export async function initializeCloudSync(activeProfile: Profile): Promise<void> {
