@@ -24,9 +24,15 @@ export async function flushWorkspacePersistence(): Promise<void> {
 }
 
 export async function applyRemoteWorkspace(data: ReturnType<typeof normalizeWorkspace>): Promise<void> {
+  await applyRemoteWorkspaceTransform(() => data)
+}
+
+export async function applyRemoteWorkspaceTransform(
+  transform: (current: ReturnType<typeof normalizeWorkspace>) => ReturnType<typeof normalizeWorkspace>,
+): Promise<void> {
   await flushWorkspacePersistence()
-  const next = normalizeWorkspace(data)
   const previous = useStore.getState().data
+  const next = normalizeWorkspace(transform(previous))
   if (previous === next) return
   await getWorkspaceRepository().persistDiff(previous, next, null)
   skipNextPersistence = true

@@ -5,12 +5,14 @@ import { EMPTY_WORKSPACE } from '../core/types'
 import { useStore } from '../store/useStore'
 import {
   applyRemoteWorkspace,
+  applyRemoteWorkspaceTransform,
   flushWorkspacePersistence,
   getWorkspaceRepository,
   setWorkspaceSyncContext,
 } from '../store/workspacePersistence'
 import { applyRemoteMutations, type RemoteMutation } from './syncProtocol'
 import { prepareCloudPayload } from './cloudFiles'
+import { replaceFileSources } from './filePayload'
 import { cloudConfigured, getSupabase } from './supabaseClient'
 import { initialCloudState, useCloudSync, type CloudState } from './cloudState'
 
@@ -104,7 +106,11 @@ async function push(workspaceId: string): Promise<void> {
     const batch = await repository.listOutbox(workspaceId, 200)
     update({ pending: batch.length })
     if (!batch.length) break
-    const payloads = await Promise.all(batch.map(prepareCloudPayload))
+    const prepared = await Promise.all(batch.map(prepareCloudPayload))
+    const replacements = new Map(prepared.flatMap(({ replacements: values }) => values))
+    if (replacements.size) {
+      await applyRemoteWorkspaceTransform((current) => replaceFileSources(current, replacements) as typeof current)
+    }
     const rows = batch.map((record, index) => ({
       mutation_id: record.mutationId,
       workspace_id: record.workspaceId,
@@ -113,7 +119,7 @@ async function push(workspaceId: string): Promise<void> {
       entity_id: record.entityId,
       operation: record.operation,
       base_revision: record.baseRevision,
-      payload: payloads[index] as Json,
+      payload: prepared[index].payload as Json,
     }))
     const { error } = await getSupabase()
       .from('sync_mutations')

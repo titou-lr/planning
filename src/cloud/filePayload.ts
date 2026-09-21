@@ -22,7 +22,7 @@ export function decodeDataUrl(source: string): DecodedDataUrl | null {
 
 export async function replaceDataUrls(
   value: unknown,
-  upload: (decoded: DecodedDataUrl) => Promise<string>,
+  upload: (decoded: DecodedDataUrl, source: string) => Promise<string>,
 ): Promise<unknown> {
   if (Array.isArray(value)) return Promise.all(value.map((item) => replaceDataUrls(item, upload)))
   if (!value || typeof value !== 'object') return value
@@ -31,10 +31,34 @@ export async function replaceDataUrls(
   for (const [key, child] of Object.entries(value)) {
     if (key === 'src' && typeof child === 'string' && child.startsWith('data:')) {
       const decoded = decodeDataUrl(child)
-      next[key] = decoded ? await upload(decoded) : child
+      next[key] = decoded ? await upload(decoded, child) : child
     } else {
       next[key] = await replaceDataUrls(child, upload)
     }
   }
   return next
+}
+
+export function replaceFileSources(value: unknown, replacements: ReadonlyMap<string, string>): unknown {
+  if (Array.isArray(value)) {
+    let changed = false
+    const next = value.map((item) => {
+      const replaced = replaceFileSources(item, replacements)
+      changed ||= replaced !== item
+      return replaced
+    })
+    return changed ? next : value
+  }
+  if (!value || typeof value !== 'object') return value
+
+  let changed = false
+  const next: Record<string, unknown> = {}
+  for (const [key, child] of Object.entries(value)) {
+    const replaced = key === 'src' && typeof child === 'string'
+      ? (replacements.get(child) ?? child)
+      : replaceFileSources(child, replacements)
+    changed ||= replaced !== child
+    next[key] = replaced
+  }
+  return changed ? next : value
 }

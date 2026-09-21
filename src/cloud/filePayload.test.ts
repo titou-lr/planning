@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { decodeDataUrl, replaceDataUrls } from './filePayload'
+import { decodeDataUrl, replaceDataUrls, replaceFileSources } from './filePayload'
 
 describe('cloud file payloads', () => {
   it('decodes base64 and percent-encoded data URLs', async () => {
@@ -23,5 +23,15 @@ describe('cloud file payloads', () => {
       attachments: [{ src: 'storage://planning-attachments/workspace/files/hash.png' }],
     })
     expect(payload.blocks[0].src).toMatch(/^data:/)
+  })
+
+  it('remplace ensuite les data URLs locales par les références Storage reçues', () => {
+    const source = 'data:text/plain;base64,b2s='
+    const stored = 'storage://planning-attachments/workspace/files/hash.txt'
+    const payload = { attachments: [{ id: 'a', src: source }], title: 'inchangé' }
+    const result = replaceFileSources(payload, new Map([[source, stored]]))
+    expect(result).toEqual({ attachments: [{ id: 'a', src: stored }], title: 'inchangé' })
+    expect(payload.attachments[0].src).toBe(source)
+    expect(replaceFileSources(payload, new Map())).toBe(payload)
   })
 })

@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(10);
+SELECT plan(12);
 
 INSERT INTO auth.users (id, aud, role, email, created_at, updated_at)
 VALUES
@@ -25,7 +25,7 @@ SELECT results_eq(
 );
 SELECT results_eq(
   $$SELECT count(*)::bigint FROM pg_policies WHERE schemaname = 'storage' AND tablename = 'objects' AND policyname LIKE 'planning_attachments_%'$$,
-  ARRAY[3::bigint],
+  ARRAY[4::bigint],
   'les objets Storage sont protégés par les politiques propriétaire'
 );
 
@@ -53,6 +53,12 @@ SELECT ok(
   NOT has_table_privilege('authenticated', 'public.sync_mutations', 'UPDATE'),
   'le journal est append-only pour le client'
 );
+SELECT lives_ok(
+  $$INSERT INTO storage.objects (bucket_id, name, owner_id)
+    VALUES ('planning-attachments', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/files/pgtap.txt',
+      '11111111-1111-4111-8111-111111111111')$$,
+  'le propriétaire peut créer un objet dans son dossier Storage'
+);
 
 SELECT set_config('request.jwt.claim.sub', '22222222-2222-4222-8222-222222222222', true);
 SELECT is_empty(
@@ -62,6 +68,11 @@ SELECT is_empty(
 SELECT is_empty(
   'SELECT mutation_id FROM public.sync_mutations',
   'un autre utilisateur ne voit aucune mutation'
+);
+SELECT is_empty(
+  $$SELECT name FROM storage.objects
+    WHERE name = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/files/pgtap.txt'$$,
+  'un autre utilisateur ne voit aucun fichier du propriétaire'
 );
 
 SELECT * FROM finish();

@@ -20,11 +20,11 @@ Le client utilise uniquement la clé publiable Supabase. Aucun secret privilégi
 
 ## Validation exécutée
 
-- 180 tests Vitest réussis.
-- 8 assertions pgTAP réussies avec deux identités distinctes.
+- 181 tests Vitest réussis.
+- 12 assertions pgTAP réussies avec deux identités distinctes, dont l'isolation du bucket privé.
 - Build TypeScript/Vite/PWA réussi; bundle initial environ 408 kB brut (130 kB gzip).
 - 9 scénarios Playwright réussis sur Chromium desktop et mobile; 3 contrôles PWA sont volontairement limités au projet desktop.
-- Test cloud de production réussi avec deux contextes navigateur indépendants : une page créée sur le premier a convergé sur le second; le compte et toutes les données temporaires ont ensuite été supprimés.
+- Test cloud de production réussi avec deux contextes navigateur indépendants : une page, une tâche et sa pièce jointe ont convergé du premier vers le second. Le fichier a été envoyé dans Storage, remplacé localement par sa référence distante, téléchargé depuis le second navigateur puis supprimé; le compte et toutes les données temporaires ont ensuite été supprimés.
 - Vérification des advisors Supabase : aucune table exposée sans RLS. L'option de protection contre les mots de passe compromis reste signalée, sans impact sur le flux passwordless retenu.
 
 ## Rollback

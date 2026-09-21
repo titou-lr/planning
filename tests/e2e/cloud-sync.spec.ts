@@ -52,13 +52,33 @@ test('deux appareils convergent via le journal Supabase', async ({ browser }) =>
   await createProfile(firstPage, 'Cloud appareil 1')
   await firstPage.getByRole('button', { name: 'Nouvelle page', exact: true }).click()
   await firstPage.getByPlaceholder('Sans titre').fill('Convergence Supabase validée')
+
+  await firstPage.getByText('Tâches', { exact: true }).click()
+  await firstPage.getByRole('button', { name: 'Tâche', exact: true }).click()
+  await firstPage.getByPlaceholder('Titre de la tâche').fill('Fichier cloud validé')
+  const fileChooser = firstPage.waitForEvent('filechooser')
+  await firstPage.getByRole('button', { name: 'Joindre' }).click()
+  await (await fileChooser).setFiles({
+    name: 'preuve-cloud.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('stockage privé Supabase validé'),
+  })
+  await expect(firstPage.getByText('preuve-cloud.txt', { exact: true })).toBeVisible()
+
   await firstPage.getByText('Réglages', { exact: true }).click()
   await firstPage.getByRole('button', { name: 'Synchroniser maintenant' }).click()
   await expect(firstPage.getByText('Synchronisé', { exact: true }).first()).toBeVisible({ timeout: 20_000 })
+  await expect.poll(() => firstPage.getByText('preuve-cloud.txt', { exact: true }).getAttribute('href')).toMatch(/^blob:/)
 
   const secondPage = await second.newPage()
   await createProfile(secondPage, 'Cloud appareil 2')
   await expect(secondPage.getByText('Convergence Supabase validée', { exact: true }).first()).toBeVisible({ timeout: 20_000 })
+  await secondPage.getByText('Tâches', { exact: true }).click()
+  await expect(secondPage.getByText('Fichier cloud validé', { exact: true })).toBeVisible({ timeout: 20_000 })
+  await secondPage.getByText('Fichier cloud validé', { exact: true }).click()
+  const attachment = secondPage.getByText('preuve-cloud.txt', { exact: true })
+  await expect(attachment).toBeVisible()
+  await expect.poll(() => attachment.getAttribute('href')).toMatch(/^blob:/)
 
   await first.close()
   await second.close()

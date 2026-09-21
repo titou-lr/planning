@@ -20,8 +20,14 @@ async function digest(blob: Blob): Promise<string> {
   return Array.from(new Uint8Array(hash), (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-export async function prepareCloudPayload(record: OutboxRecord): Promise<unknown> {
-  return replaceDataUrls(record.payload, async ({ blob, mimeType }: DecodedDataUrl) => {
+export interface PreparedCloudPayload {
+  payload: unknown
+  replacements: Array<readonly [string, string]>
+}
+
+export async function prepareCloudPayload(record: OutboxRecord): Promise<PreparedCloudPayload> {
+  const replacements: Array<readonly [string, string]> = []
+  const payload = await replaceDataUrls(record.payload, async ({ blob, mimeType }: DecodedDataUrl, source) => {
     const hash = await digest(blob)
     const path = `${record.workspaceId}/files/${hash}.${extensionFor(mimeType)}`
     const { error } = await getSupabase().storage.from(BUCKET).upload(path, blob, {
@@ -29,8 +35,11 @@ export async function prepareCloudPayload(record: OutboxRecord): Promise<unknown
       upsert: true,
     })
     if (error) throw error
-    return `${STORAGE_PREFIX}${path}`
+    const stored = `${STORAGE_PREFIX}${path}`
+    replacements.push([source, stored])
+    return stored
   })
+  return { payload, replacements }
 }
 
 export function resolveCloudFileSource(source: string): Promise<string> {
