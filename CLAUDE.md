@@ -1,5 +1,7 @@
 # CLAUDE.md — Suite de Productivité Locale (nom de projet à définir)
 
+> **Directive de migration.** Les contraintes « zéro backend » de ce document décrivent l'architecture historique. Pour les travaux de migration cloud et PWA, [`MIGRATION_CLOUD.md`](MIGRATION_CLOUD.md) prévaut explicitement. L'ancien chemin local/Electron doit rester fonctionnel jusqu'aux critères de parité et de restauration définis par ce plan.
+
 ## Vision
 
 Une application Windows **100 % locale** réunissant les usages de Notion (notes, bases de données), Linear (tâches, projets, tickets), et d'un calendrier de planification perso/pro (type Sunsama/Motion), avec un **assistant IA intégré** qui agit dans l'app sur confirmation explicite. Aucune de ses fonctions ne dépend d'un serveur qui t'appartiendrait : l'utilisateur possède ses données, l'app fonctionne hors-ligne, et rien n'est perdu si aucun compte n'est créé.

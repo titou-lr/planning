@@ -1,5 +1,7 @@
 # Planning
 
+> Migration en cours : [`MIGRATION_CLOUD.md`](MIGRATION_CLOUD.md) est le document directeur pour le passage progressif vers une PWA locale-first synchronisée. Les descriptions « 100 % locale » ci-dessous documentent l'état stable actuel, conservé jusqu'à validation de la parité.
+
 Suite de productivité **100 % locale** — notes, tâches, calendrier — en application Windows (Electron).
 Aucune donnée ne quitte la machine : tout est stocké localement.
 
