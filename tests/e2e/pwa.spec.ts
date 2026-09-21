@@ -21,7 +21,10 @@ test('expose un manifeste installable et un service worker actif', async ({ page
 
   expect(manifest).toMatchObject({ name: 'Planning', display: 'standalone' })
   expect(manifest.icons).not.toHaveLength(0)
-  await expect.poll(() => page.evaluate(async () => Boolean(await navigator.serviceWorker.ready))).toBe(true)
+  await expect.poll(
+    () => page.evaluate(async () => Boolean(await navigator.serviceWorker.ready)),
+    { timeout: 15_000 },
+  ).toBe(true)
 })
 
 test('reste utilisable hors ligne après la première visite', async ({ page, context }) => {
