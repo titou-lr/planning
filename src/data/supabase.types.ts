@@ -14,39 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      _prisma_migrations: {
-        Row: {
-          applied_steps_count: number
-          checksum: string
-          finished_at: string | null
-          id: string
-          logs: string | null
-          migration_name: string
-          rolled_back_at: string | null
-          started_at: string
-        }
-        Insert: {
-          applied_steps_count?: number
-          checksum: string
-          finished_at?: string | null
-          id: string
-          logs?: string | null
-          migration_name: string
-          rolled_back_at?: string | null
-          started_at?: string
-        }
-        Update: {
-          applied_steps_count?: number
-          checksum?: string
-          finished_at?: string | null
-          id?: string
-          logs?: string | null
-          migration_name?: string
-          rolled_back_at?: string | null
-          started_at?: string
-        }
-        Relationships: []
-      }
       attachments: {
         Row: {
           created_at: string
@@ -140,44 +107,6 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      Block: {
-        Row: {
-          content: Json
-          createdAt: string
-          id: string
-          order: number
-          pageId: string
-          type: Database["public"]["Enums"]["BlockType"]
-          updatedAt: string
-        }
-        Insert: {
-          content: Json
-          createdAt?: string
-          id: string
-          order: number
-          pageId: string
-          type: Database["public"]["Enums"]["BlockType"]
-          updatedAt: string
-        }
-        Update: {
-          content?: Json
-          createdAt?: string
-          id?: string
-          order?: number
-          pageId?: string
-          type?: Database["public"]["Enums"]["BlockType"]
-          updatedAt?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Block_pageId_fkey"
-            columns: ["pageId"]
-            isOneToOne: false
-            referencedRelation: "Page"
             referencedColumns: ["id"]
           },
         ]
@@ -327,62 +256,6 @@ export type Database = {
           },
         ]
       }
-      Event: {
-        Row: {
-          category: string | null
-          color: string | null
-          createdAt: string
-          description: string | null
-          endAt: string
-          id: string
-          isRecurring: boolean
-          recurrence: string | null
-          sourceLabel: string | null
-          startAt: string
-          title: string
-          updatedAt: string
-          userId: string
-        }
-        Insert: {
-          category?: string | null
-          color?: string | null
-          createdAt?: string
-          description?: string | null
-          endAt: string
-          id: string
-          isRecurring?: boolean
-          recurrence?: string | null
-          sourceLabel?: string | null
-          startAt: string
-          title: string
-          updatedAt: string
-          userId: string
-        }
-        Update: {
-          category?: string | null
-          color?: string | null
-          createdAt?: string
-          description?: string | null
-          endAt?: string
-          id?: string
-          isRecurring?: boolean
-          recurrence?: string | null
-          sourceLabel?: string | null
-          startAt?: string
-          title?: string
-          updatedAt?: string
-          userId?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Event_userId_fkey"
-            columns: ["userId"]
-            isOneToOne: false
-            referencedRelation: "User"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       goals: {
         Row: {
           created_at: string
@@ -514,54 +387,6 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      Page: {
-        Row: {
-          createdAt: string
-          icon: string | null
-          id: string
-          isDeleted: boolean
-          parentId: string | null
-          title: string
-          updatedAt: string
-          userId: string
-        }
-        Insert: {
-          createdAt?: string
-          icon?: string | null
-          id: string
-          isDeleted?: boolean
-          parentId?: string | null
-          title?: string
-          updatedAt: string
-          userId: string
-        }
-        Update: {
-          createdAt?: string
-          icon?: string | null
-          id?: string
-          isDeleted?: boolean
-          parentId?: string | null
-          title?: string
-          updatedAt?: string
-          userId?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Page_parentId_fkey"
-            columns: ["parentId"]
-            isOneToOne: false
-            referencedRelation: "Page"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "Page_userId_fkey"
-            columns: ["userId"]
-            isOneToOne: false
-            referencedRelation: "User"
             referencedColumns: ["id"]
           },
         ]
@@ -779,95 +604,6 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      Reminder: {
-        Row: {
-          createdAt: string
-          description: string | null
-          dueAt: string | null
-          id: string
-          isDeleted: boolean
-          isDone: boolean
-          listId: string | null
-          priority: Database["public"]["Enums"]["Priority"]
-          title: string
-          updatedAt: string
-          userId: string
-        }
-        Insert: {
-          createdAt?: string
-          description?: string | null
-          dueAt?: string | null
-          id: string
-          isDeleted?: boolean
-          isDone?: boolean
-          listId?: string | null
-          priority?: Database["public"]["Enums"]["Priority"]
-          title: string
-          updatedAt: string
-          userId: string
-        }
-        Update: {
-          createdAt?: string
-          description?: string | null
-          dueAt?: string | null
-          id?: string
-          isDeleted?: boolean
-          isDone?: boolean
-          listId?: string | null
-          priority?: Database["public"]["Enums"]["Priority"]
-          title?: string
-          updatedAt?: string
-          userId?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Reminder_listId_fkey"
-            columns: ["listId"]
-            isOneToOne: false
-            referencedRelation: "ReminderList"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "Reminder_userId_fkey"
-            columns: ["userId"]
-            isOneToOne: false
-            referencedRelation: "User"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      ReminderList: {
-        Row: {
-          color: string | null
-          createdAt: string
-          id: string
-          name: string
-          userId: string
-        }
-        Insert: {
-          color?: string | null
-          createdAt?: string
-          id: string
-          name: string
-          userId: string
-        }
-        Update: {
-          color?: string | null
-          createdAt?: string
-          id?: string
-          name?: string
-          userId?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ReminderList_userId_fkey"
-            columns: ["userId"]
-            isOneToOne: false
-            referencedRelation: "User"
             referencedColumns: ["id"]
           },
         ]
@@ -1166,27 +902,6 @@ export type Database = {
           },
         ]
       }
-      User: {
-        Row: {
-          createdAt: string
-          email: string
-          id: string
-          name: string | null
-        }
-        Insert: {
-          createdAt?: string
-          email: string
-          id: string
-          name?: string | null
-        }
-        Update: {
-          createdAt?: string
-          email?: string
-          id?: string
-          name?: string | null
-        }
-        Relationships: []
-      }
       workspace_members: {
         Row: {
           created_at: string
@@ -1254,19 +969,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      BlockType:
-        | "TEXT"
-        | "HEADING_1"
-        | "HEADING_2"
-        | "HEADING_3"
-        | "BULLET_LIST"
-        | "NUMBERED_LIST"
-        | "CODE"
-        | "IMAGE"
-        | "DIVIDER"
-        | "QUOTE"
-        | "TODO"
-      Priority: "LOW" | "NORMAL" | "HIGH"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1393,21 +1096,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      BlockType: [
-        "TEXT",
-        "HEADING_1",
-        "HEADING_2",
-        "HEADING_3",
-        "BULLET_LIST",
-        "NUMBERED_LIST",
-        "CODE",
-        "IMAGE",
-        "DIVIDER",
-        "QUOTE",
-        "TODO",
-      ],
-      Priority: ["LOW", "NORMAL", "HIGH"],
-    },
+    Enums: {},
   },
 } as const
