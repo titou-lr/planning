@@ -1,7 +1,11 @@
 node_modules/
 dist/
+dev-dist/
 release/
 playwright-report/
 test-results/
+.vercel/
+supabase/.temp/
+supabase/.branches/
 *.tsbuildinfo
 .DS_Store

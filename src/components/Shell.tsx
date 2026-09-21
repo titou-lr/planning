@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import type { Profile } from '../store/profileService'
 import { requestProfileSwitch } from '../store/profileService'
 import { useStore, type AppSection } from '../store/useStore'
@@ -7,25 +7,26 @@ import { useAiSettings } from '../store/aiSettings'
 import { findPage, ancestorsOf } from '../core/tree'
 import SidebarTree from './SidebarTree'
 import CommandPalette from './CommandPalette'
-import PageView from './PageView'
-import DatabasePage from './database/DatabasePage'
 import HomeView from './HomeView'
-import SettingsModal from './SettingsModal'
-import WorkView from './work/WorkView'
-import ProjectsView from './work/ProjectsView'
-import CyclesView from './work/CyclesView'
-import GoalsView from './work/GoalsView'
-import ReportsView from './work/ReportsView'
-import AutomationsView from './work/AutomationsView'
-import CalendarView from './calendar/CalendarView'
-import HabitsView from './calendar/HabitsView'
-import AssistantPanel from './assistant/AssistantPanel'
 import { ToastHost } from './Toast'
 import {
   IconHome, IconSearch, IconSettings, IconUndo, IconRedo,
   IconCheckCircle, IconFolder, IconCycle, IconTarget, IconChart, IconZap,
   IconCalendar, IconActivity, IconWand,
 } from './icons'
+
+const PageView = lazy(() => import('./PageView'))
+const DatabasePage = lazy(() => import('./database/DatabasePage'))
+const SettingsModal = lazy(() => import('./SettingsModal'))
+const WorkView = lazy(() => import('./work/WorkView'))
+const ProjectsView = lazy(() => import('./work/ProjectsView'))
+const CyclesView = lazy(() => import('./work/CyclesView'))
+const GoalsView = lazy(() => import('./work/GoalsView'))
+const ReportsView = lazy(() => import('./work/ReportsView'))
+const AutomationsView = lazy(() => import('./work/AutomationsView'))
+const CalendarView = lazy(() => import('./calendar/CalendarView'))
+const HabitsView = lazy(() => import('./calendar/HabitsView'))
+const AssistantPanel = lazy(() => import('./assistant/AssistantPanel'))
 
 const SECTION_TITLES: Record<AppSection, string> = {
   home: 'Accueil', notes: 'Notes',
@@ -43,6 +44,30 @@ export default function Shell({ profile }: { profile: Profile }) {
   const [assistantOpen, setAssistantOpen] = useState(false)
 
   useReminders()
+
+  useEffect(() => {
+    function applyRoute() {
+      const path = window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean)
+      if (path[0] === 'notes' && path[1]) {
+        useStore.getState().setSection('notes')
+        useStore.getState().setCurrentPage(decodeURIComponent(path[1]))
+      } else if (path[0] && path[0] in SECTION_TITLES) {
+        useStore.getState().setSection(path[0] as AppSection)
+        useStore.getState().setCurrentPage(null)
+      }
+    }
+
+    applyRoute()
+    window.addEventListener('hashchange', applyRoute)
+    return () => window.removeEventListener('hashchange', applyRoute)
+  }, [])
+
+  useEffect(() => {
+    const route = currentPageId
+      ? `#/notes/${encodeURIComponent(currentPageId)}`
+      : `#/${section}`
+    if (window.location.hash !== route) window.history.replaceState(null, '', route)
+  }, [currentPageId, section])
 
   // Réglages IA du profil (chargés depuis le stockage, chiffré le cas échéant)
   useEffect(() => {
@@ -191,27 +216,35 @@ export default function Shell({ profile }: { profile: Profile }) {
           </button>
         </header>
 
-        {section === 'tasks' ? <WorkView />
-          : section === 'projects' ? <ProjectsView />
-          : section === 'cycles' ? <CyclesView />
-          : section === 'goals' ? <GoalsView />
-          : section === 'reports' ? <ReportsView />
-          : section === 'automations' ? <AutomationsView />
-          : section === 'calendar' ? <CalendarView />
-          : section === 'habits' ? <HabitsView />
-          : currentPage
-            ? currentPage.kind === 'database'
-              ? <DatabasePage key={currentPage.id} db={currentPage} />
-              : <PageView key={currentPage.id} page={currentPage} />
-            : <HomeView />}
+        <Suspense fallback={<div className="caption" style={{ padding: 24 }}>Chargement…</div>}>
+          {section === 'tasks' ? <WorkView />
+            : section === 'projects' ? <ProjectsView />
+            : section === 'cycles' ? <CyclesView />
+            : section === 'goals' ? <GoalsView />
+            : section === 'reports' ? <ReportsView />
+            : section === 'automations' ? <AutomationsView />
+            : section === 'calendar' ? <CalendarView />
+            : section === 'habits' ? <HabitsView />
+            : currentPage
+              ? currentPage.kind === 'database'
+                ? <DatabasePage key={currentPage.id} db={currentPage} />
+                : <PageView key={currentPage.id} page={currentPage} />
+              : <HomeView />}
+        </Suspense>
       </div>
 
-      {assistantOpen && (
-        <AssistantPanel onClose={() => setAssistantOpen(false)} onOpenSettings={() => setSettingsOpen(true)} />
-      )}
+      {assistantOpen ? (
+        <Suspense fallback={null}>
+          <AssistantPanel onClose={() => setAssistantOpen(false)} onOpenSettings={() => setSettingsOpen(true)} />
+        </Suspense>
+      ) : null}
 
       {paletteOpen && <CommandPalette onClose={() => setPaletteOpen(false)} onOpenSettings={() => setSettingsOpen(true)} />}
-      {settingsOpen && <SettingsModal profile={profile} onClose={() => setSettingsOpen(false)} />}
+      {settingsOpen ? (
+        <Suspense fallback={null}>
+          <SettingsModal profile={profile} onClose={() => setSettingsOpen(false)} />
+        </Suspense>
+      ) : null}
       <ToastHost />
     </div>
   )

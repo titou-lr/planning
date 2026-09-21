@@ -35,7 +35,7 @@ export type AppSection =
  * piles d'undo restent en mémoire.
  */
 
-interface StoreState {
+export interface StoreState {
   data: WorkspaceData
   currentPageId: string | null
   expanded: Record<string, boolean>
@@ -140,6 +140,12 @@ interface StoreState {
 
   undo: () => void
   redo: () => void
+}
+
+let persistWorkspaceSnapshot = true
+
+export function stopLegacyWorkspacePersistence(): void {
+  persistWorkspaceSnapshot = false
 }
 
 function now(): string {
@@ -884,7 +890,7 @@ export const useStore = create<StoreState>()(
       // localStorage avec chiffrement optionnel par profil (§4)
       storage: createJSONStorage(() => secureStorage),
       partialize: (s) => ({
-        data: s.data,
+        ...(persistWorkspaceSnapshot ? { data: s.data } : {}),
         currentPageId: s.currentPageId,
         expanded: s.expanded,
         activeView: s.activeView,
